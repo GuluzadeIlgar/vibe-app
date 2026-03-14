@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { supabaseAdmin } from "@/lib/supabase";
 
 const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
@@ -32,6 +33,29 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, profile }) {
+      if (!user.email) return true;
+      try {
+        const googleProfile = profile as { given_name?: string; family_name?: string } | undefined;
+        const name = googleProfile?.given_name ?? user.name?.split(" ")[0] ?? null;
+        const surname =
+          googleProfile?.family_name ??
+          (user.name?.split(" ").slice(1).join(" ") || null) ??
+          null;
+        await supabaseAdmin.from("users").upsert(
+          {
+            email: user.email,
+            name,
+            surname,
+            picture: user.image ?? null,
+          },
+          { onConflict: "email" }
+        );
+      } catch (err) {
+        console.error("[auth] Failed to sync user to Supabase:", err);
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.name = user.name;
