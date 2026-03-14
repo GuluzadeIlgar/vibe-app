@@ -1,9 +1,10 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const secret = process.env.NEXTAUTH_SECRET;
+const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+const secret = (process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET)?.trim();
+const url = process.env.NEXTAUTH_URL?.trim();
 
 if (!clientId || !clientSecret) {
   throw new Error(
@@ -15,9 +16,15 @@ if (!secret) {
     "Missing NEXTAUTH_SECRET. Add NEXTAUTH_SECRET to .env.local (e.g. run: openssl rand -hex 32)"
   );
 }
+if (!url) {
+  throw new Error(
+    "Missing NEXTAUTH_URL. Add NEXTAUTH_URL to .env.local (e.g. NEXTAUTH_URL=http://localhost:3000)"
+  );
+}
 
 export const authOptions: NextAuthOptions = {
   secret,
+  ...(url && { url }),
   trustHost: true,
   providers: [
     GoogleProvider({
