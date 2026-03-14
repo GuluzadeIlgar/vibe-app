@@ -25,7 +25,6 @@ if (!url) {
 export const authOptions: NextAuthOptions = {
   secret,
   ...(url && { url }),
-  trustHost: true,
   providers: [
     GoogleProvider({
       clientId,
