@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 type Props = {
   isOpen: boolean;
   onNavigatePlayground: () => void;
@@ -73,12 +75,12 @@ export function DashboardSidebar({ isOpen, onNavigatePlayground }: Props) {
         </p>
       </div>
 
-      <a
+      <Link
         href="/"
         className="mt-4 inline-flex items-center justify-between rounded-2xl bg-slate-900 px-3 py-2 text-xs font-medium text-slate-50 shadow-sm dark:bg-slate-50 dark:text-slate-900"
       >
         <span>← Back to home</span>
-      </a>
+      </Link>
     </aside>
   );
 }

@@ -1,15 +1,14 @@
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
-
-const nextAuth = NextAuth(authOptions);
 
 async function handler(
   req: Request,
   context: { params: Promise<{ nextauth: string[] }> }
 ) {
   try {
+    const nextAuth = NextAuth(getAuthOptions());
     return await nextAuth(req, context);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";
